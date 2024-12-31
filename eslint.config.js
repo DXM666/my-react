@@ -5,7 +5,7 @@ import eslintConfigPrettier from 'eslint-config-prettier'
 
 export default [
     {
-        files: ['packages/**/*.{js,jsx,ts,tsx}'],
+        files: ['packages/**/*.{js,jsx,ts,tsx}', 'examples/**/*.{js,jsx,ts,tsx}'],
         languageOptions: {
             parser: tsParser,
             parserOptions: {
@@ -20,10 +20,13 @@ export default [
         rules: {
             ...tsPlugin.configs.recommended.rules,
             ...eslintConfigPrettier.rules,
-            'prettier/prettier': 'error',
+            'prettier/prettier': ['error', {
+                endOfLine: 'auto'
+            }],
             'no-case-declarations': 'off',
             'no-constant-condition': 'off',
-            '@typescript-eslint/ban-ts-comment': 'off'
+            '@typescript-eslint/ban-ts-comment': 'off',
+            '@typescript-eslint/no-explicit-any': 'off'
         }
     }
 ]

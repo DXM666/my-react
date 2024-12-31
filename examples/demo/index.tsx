@@ -1,18 +1,18 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+// import ReactDOM from 'react-dom/client';
 
-function App() {
-	return (
-		<div>
-			<Child />
-		</div>
-	);
-}
+// function App() {
+// 	return (
+// 		<div>
+// 			<Child />
+// 		</div>
+// 	);
+// }
+console.log(123, React);
+// function Child() {
+// 	return <span>big-react</span>;
+// }
 
-function Child() {
-	return <span>big-react</span>;
-}
-
-ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-	(<App />) as any
-);
+// ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+// 	(<App />) as any
+// );

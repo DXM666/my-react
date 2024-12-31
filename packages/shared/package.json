@@ -1,13 +1,10 @@
 {
-  "name": "react",
+  "name": "shared",
   "version": "1.0.0",
-  "description": "mini react implementation",
-  "module": "index.ts",
+  "description": "",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "dependencies": {
-    "shared": "workspace:*"
   },
   "keywords": [],
   "author": "",
