@@ -8,7 +8,9 @@ import React from 'react';
 // 		</div>
 // 	);
 // }
+const ele = <div>1231</div>;
 console.log(123, React);
+console.log('ele', ele);
 // function Child() {
 // 	return <span>big-react</span>;
 // }

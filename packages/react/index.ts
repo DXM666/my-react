@@ -1,10 +1,10 @@
-import { jsx, ReactElement } from './src/jsx';
+import { jsx, ReactElement, jsxDEV } from './src/jsx';
 
-export { jsx, ReactElement };
+export { jsx, ReactElement, jsxDEV };
 
 const React = {
 	createElement: jsx,
-	version: '1.1.6'
+	version: '1.1.2'
 };
 
 export default React;

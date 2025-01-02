@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --config scripts/vite.demo.js --force",
-    "build": "vite build --config scripts/vite.packages.js",
+    "build": "rimraf dist && rollup --bundleConfigAsCjs --config scripts/rollup/react.config.js",
     "lint": "eslint \"**/*.{js,jsx,ts,tsx}\" --fix",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
     "prepare": "husky"
@@ -15,15 +15,20 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^28.0.2",
+    "@rollup/plugin-replace": "^5.0.5",
     "@typescript-eslint/eslint-plugin": "^8.19.0",
     "@typescript-eslint/parser": "^8.19.0",
     "@vitejs/plugin-react": "^4.2.1",
-    "@rollup/plugin-replace": "^5.0.5",
     "eslint": "^9.17.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
     "husky": "^9.1.7",
     "prettier": "^3.4.2",
+    "rimraf": "^6.0.1",
+    "rollup": "^4.29.1",
+    "rollup-plugin-generate-package-json": "^3.2.0",
+    "rollup-plugin-typescript2": "^0.36.0",
     "typescript": "^5.3.3",
     "vite": "^6.0.6"
   }
