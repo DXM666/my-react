@@ -42,13 +42,13 @@ export default [
 			{
 				file: `${pkgDistPath}/jsx-runtime.js`,
 				name: 'jsx-runtime.js',
-				formate: 'umd'
+				format: 'umd'
 			},
 			// jsx-dev-runtime
 			{
 				file: `${pkgDistPath}/jsx-dev-runtime.js`,
 				name: 'jsx-dev-runtime.js',
-				formate: 'umd'
+				format: 'umd'
 			}
 		],
 		plugins: getBaseRollupPlugins()
