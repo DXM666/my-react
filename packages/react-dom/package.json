@@ -1,12 +1,8 @@
 {
-  "name": "react-reconciler",
+  "name": "react-dom",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "dependencies": {
-    "shared": "workspace:*",
-    "react-dom": "workspace:*"
-  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
