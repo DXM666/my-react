@@ -9,7 +9,7 @@ function prepareFreshStack(root: FiberRootNode) {
 	workInProgress = createWorkInProgress(root.current, {});
 }
 
-export function scheduleUpdateOnFiber(fiber: FiberNode) {
+function scheduleUpdateOnFiber(fiber: FiberNode) {
 	// TODO 调度功能
 	// fiberRootNode
 	const root = markUpdateFromFiberToRoot(fiber);
@@ -37,10 +37,17 @@ function renderRoot(root: FiberRootNode) {
 			workLoop();
 			break;
 		} catch (e) {
-			console.warn('workLoop发生错误', e);
+			if (__DEV__) {
+				console.warn('workLoop发生错误', e);
+			}
 			workInProgress = null;
 		}
 	} while (true);
+
+	const finishedWork = root.current.alternate;
+	root.finishedWork = finishedWork;
+
+	// commitRoot(root);
 }
 
 function workLoop() {
@@ -72,4 +79,4 @@ function completeUnitOfWork(fiber: FiberNode) {
 	} while (node != null);
 }
 
-export { renderRoot };
+export { scheduleUpdateOnFiber };
