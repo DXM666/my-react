@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --force --config scripts/vite.demo.js",
-    "build": "rimraf dist && rollup --bundleConfigAsCjs --config scripts/rollup/react.config.js",
+    "build": "rimraf dist && rollup --bundleConfigAsCjs --config scripts/rollup/dev.config.js",
     "lint": "eslint \"**/*.{js,jsx,ts,tsx}\" --fix",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
     "prepare": "husky"
@@ -15,6 +15,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@rollup/plugin-alias": "^5.1.1",
     "@rollup/plugin-commonjs": "^28.0.2",
     "@rollup/plugin-replace": "^5.0.7",
     "@types/react": "^19.0.2",

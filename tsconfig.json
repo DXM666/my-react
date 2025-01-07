@@ -19,8 +19,8 @@
 		"noImplicitReturns": false,
 		"skipLibCheck": true,
 		"baseUrl": "./packages",
-		// "paths": {
-		// 	"react": ["./react/index.ts"]
-		// }
+		"paths": {
+			"hostConfig": ["./react-dom/src/hostConfig.ts"]
+		}
 	}
 }

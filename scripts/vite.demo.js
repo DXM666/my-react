@@ -15,7 +15,8 @@ export default defineConfig({
 	],
 	resolve: {
 		alias: {
-			react: path.resolve(distPath, 'react')
+			react: path.resolve(distPath, 'react'),
+			'react-dom': path.resolve(distPath, 'react-dom')
 		}
 	},
 	root: path.resolve(__dirname, '../examples/demo'),

@@ -1,8 +1,9 @@
 import {
 	appendInitialChild,
 	createInstance,
-	createTextInstance
-} from 'react-dom/hostConfig';
+	createTextInstance,
+	Container
+} from 'hostConfig';
 import { FiberNode } from './fiber';
 import {
 	HostRoot,
@@ -49,7 +50,7 @@ export const completeWork = (workInProgress: FiberNode) => {
 	}
 };
 
-function appendAllChildren(parent: Element, workInProgress: FiberNode) {
+function appendAllChildren(parent: Container, workInProgress: FiberNode) {
 	let node = workInProgress.child;
 	while (node !== null) {
 		if (node.tag === HostComponent || node.tag === HostText) {
