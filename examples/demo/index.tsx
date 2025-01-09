@@ -1,5 +1,5 @@
 import React from 'react';
-// import ReactDOM from 'react-dom/client';
+import ReactDOM from 'react-dom/client';
 
 // function App() {
 // 	return (
@@ -8,9 +8,11 @@ import React from 'react';
 // 		</div>
 // 	);
 // }
-const ele = <div>1231</div>;
-console.log(123, React);
-console.log('ele', ele);
+const jsx = <div>1231</div>;
+console.log('React', React);
+console.log('jsx', jsx);
+console.log('ReactDOM', ReactDOM);
+ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(jsx);
 // function Child() {
 // 	return <span>big-react</span>;
 // }

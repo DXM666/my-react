@@ -29,6 +29,7 @@ export const completeWork = (workInProgress: FiberNode) => {
 				const instance = createInstance(workInProgress);
 				// 插入DOM
 				appendAllChildren(instance, workInProgress);
+				workInProgress.stateNode = instance;
 			}
 			bubbleProperties(workInProgress);
 			return null;

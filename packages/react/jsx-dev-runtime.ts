@@ -1,1 +1,1 @@
-export { jsx as jsxDev } from './src/jsx';
+export { jsxDEV } from './src/jsx';

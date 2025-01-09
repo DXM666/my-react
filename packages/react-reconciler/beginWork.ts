@@ -31,6 +31,7 @@ function updateHostRoot(workInProgress: FiberNode) {
 
 	const child = workInProgress.memoizedState;
 	reconcileChildren(workInProgress, child);
+	return workInProgress.child;
 }
 
 function updateHostComponent(workInProgress: FiberNode) {

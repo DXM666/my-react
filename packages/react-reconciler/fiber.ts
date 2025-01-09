@@ -60,6 +60,7 @@ export class FiberRootNode {
 		this.container = container;
 		this.current = hostRootFiber;
 		this.finishedWork = null;
+		hostRootFiber.stateNode = this;
 		// this.pendingChildren = null;
 	}
 }
