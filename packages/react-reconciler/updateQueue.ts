@@ -1,7 +1,9 @@
+import { Dispatch } from 'react/src/currentDispatcher';
 import { Action } from 'shared/ReactTypes';
 
 export interface Update<State> {
 	action: Action<State>;
+	dispatch: Dispatch<State> | null;
 }
 
 export interface UpdateQueue<State> {
@@ -12,7 +14,8 @@ export interface UpdateQueue<State> {
 
 export const createUpdate = <State>(action: Action<State>): Update<State> => {
 	return {
-		action
+		action,
+		dispatch: null
 	};
 };
 

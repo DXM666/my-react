@@ -11,14 +11,17 @@ function prepareFreshStack(root: FiberRootNode) {
 	workInProgress = createWorkInProgress(root.current, {});
 }
 
-function scheduleUpdateOnFiber(fiber: FiberNode) {
+function scheduleUpdateOnFiber(fiber: FiberNode | null) {
 	// TODO 调度功能
 	// fiberRootNode
 	const root = markUpdateFromFiberToRoot(fiber);
 	renderRoot(root);
 }
 
-function markUpdateFromFiberToRoot(fiber: FiberNode) {
+function markUpdateFromFiberToRoot(fiber: FiberNode | null) {
+	if (fiber === null) {
+		throw new Error('markUpdateFromFiberToRoot:fiber不存在');
+	}
 	let node = fiber;
 	let parent = node.return;
 	while (parent !== null) {
