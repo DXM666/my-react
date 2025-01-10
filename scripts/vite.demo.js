@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import replace from '@rollup/plugin-replace';
+import { replaceConfig } from './utils';
 
 const resolvePkgPath = (pkgName, isDist) => {
 	if (isDist) {
@@ -14,13 +15,7 @@ const distPath = path.resolve(__dirname, '../dist/node_modules');
 const pkgPath = path.resolve(__dirname, '../packages');
 
 export default defineConfig({
-	plugins: [
-		react(),
-		replace({
-			__DEV__: true,
-			preventAssignment: true
-		})
-	],
+	plugins: [react(), replace(replaceConfig)],
 	resolve: {
 		alias: [
 			{

@@ -34,14 +34,23 @@ const jsx = (
 	const props: Props = {};
 	let ref: Ref = null;
 
-	if (config !== null) {
-		if (config.key !== undefined) {
-			key = config.key;
+	for (const prop in config) {
+		const val = config[prop];
+		if (prop === 'key') {
+			if (val !== undefined) {
+				key = '' + val;
+			}
+			continue;
 		}
-		if (config.ref !== undefined) {
-			ref = config.ref;
+		if (prop === 'ref') {
+			if (val !== undefined) {
+				ref = val;
+			}
+			continue;
 		}
-		Object.assign(props, config);
+		if ({}.hasOwnProperty.call(config, prop)) {
+			props[prop] = val;
+		}
 	}
 
 	const childLength = maybeChildren.length;
@@ -73,6 +82,14 @@ const jsxDEV = (type: ElementType, config: any): ReactElementType => {
 	return ReactElement(type, key, ref, props);
 };
 
+function isValidElement(object: any) {
+	return (
+		typeof object === 'object' &&
+		object !== null &&
+		object.$$typeof === REACT_ELEMENT_TYPE
+	);
+}
+
 // export default jsx;
 // export { jsx as jsxRuntime, jsxDEV as jsxDEVRuntime };
-export { jsx, jsxDEV, ReactElement };
+export { jsx, jsxDEV, ReactElement, isValidElement };
