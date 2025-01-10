@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "type": "commonjs",
+  "type": "module",
   "scripts": {
     "dev": "vite --config scripts/vite.demo.js",
     "build": "rimraf dist && rollup --bundleConfigAsCjs --config scripts/rollup/dev.config.js",

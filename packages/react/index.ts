@@ -5,7 +5,6 @@ import {
 	currentDispatcher
 } from './src/currentDispatcher';
 
-
 export const useState: Dispatcher['useState'] = (initState: any) => {
 	const currentDispatcher = resolveDispatcher();
 	return currentDispatcher.useState(initState);

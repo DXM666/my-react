@@ -10,7 +10,7 @@
 'use strict';
 
 let React;
-let ReactDOM;
+// let ReactDOM;
 let ReactTestUtils;
 
 describe('ReactElement', () => {
@@ -75,7 +75,9 @@ describe('ReactElement', () => {
 	});
 
 	it('does not fail if config has no prototype', () => {
-		const config = Object.create(null, { foo: { value: 1, enumerable: true } });
+		const config = Object.create(null, {
+			foo: { value: 1, enumerable: true }
+		});
 		const element = React.createElement(ComponentFC, config);
 		expect(element.props.foo).toBe(1);
 	});
@@ -193,7 +195,9 @@ describe('ReactElement', () => {
 		}
 
 		expect(React.isValidElement(React.createElement('div'))).toEqual(true);
-		expect(React.isValidElement(React.createElement(Component))).toEqual(true);
+		expect(React.isValidElement(React.createElement(Component))).toEqual(
+			true
+		);
 
 		expect(React.isValidElement(null)).toEqual(false);
 		expect(React.isValidElement(true)).toEqual(false);
@@ -219,7 +223,9 @@ describe('ReactElement', () => {
 			return <div />;
 		}
 
-		const test = ReactTestUtils.renderIntoDocument(<Test value={+undefined} />);
+		const test = ReactTestUtils.renderIntoDocument(
+			<Test value={+undefined} />
+		);
 		expect(test.props.value).toBeNaN();
 	});
 
@@ -230,12 +236,12 @@ describe('ReactElement', () => {
 		// @eslint-
 		// Once all jest engines support Symbols natively we can swap this to test
 		// WITH native Symbols by default.
-		/*eslint-disable */
+
 		const REACT_ELEMENT_TYPE = function () {}; // fake Symbol
-		// eslint-disable-line no-use-before-define
+
 		const OTHER_SYMBOL = function () {}; // another fake Symbol
-		/*eslint-enable */
-		global.Symbol = function (name) {
+
+		global.Symbol = function () {
 			return OTHER_SYMBOL;
 		};
 		global.Symbol.for = function (key) {
@@ -254,7 +260,9 @@ describe('ReactElement', () => {
 		}
 
 		expect(React.isValidElement(React.createElement('div'))).toEqual(true);
-		expect(React.isValidElement(React.createElement(Component))).toEqual(true);
+		expect(React.isValidElement(React.createElement(Component))).toEqual(
+			true
+		);
 
 		expect(React.isValidElement(null)).toEqual(false);
 		expect(React.isValidElement(true)).toEqual(false);
