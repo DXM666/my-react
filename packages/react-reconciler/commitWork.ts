@@ -41,7 +41,7 @@ function commitMutationEffectsOnFiber(fiber: FiberNode) {
 
 function commitPlacement(fiber: FiberNode) {
 	if (__DEV__) {
-		console.log('commitPlacement', fiber);
+		console.warn('执行Placement操作', fiber);
 	}
 	// get host parent
 	const hostParent = getHostParent(fiber);

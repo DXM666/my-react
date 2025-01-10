@@ -59,6 +59,10 @@ function commitRoot(root: FiberRootNode) {
 		return;
 	}
 
+	if (__DEV__) {
+		console.warn('commit阶段开始', finishedWork);
+	}
+
 	const subTreeHasEffect =
 		(MutationMask & finishedWork.subtreeFlags) !== NoFlags;
 	const hasEffect = (MutationMask & finishedWork.flags) !== NoFlags;

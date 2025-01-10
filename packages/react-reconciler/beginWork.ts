@@ -3,6 +3,7 @@ import { HostRoot, HostComponent, FunctionComponent } from './workTags';
 import { processUpdateQueue } from './updateQueue';
 import { ReactElementType } from 'shared/ReactTypes';
 import { mountChildFibers, reconcileChildFibers } from './childFibers';
+import { renderWithHooks } from './fiberHooks';
 
 export const beginWork = (workInProgress: FiberNode) => {
 	console.log('beginWork', workInProgress);
@@ -15,7 +16,7 @@ export const beginWork = (workInProgress: FiberNode) => {
 		case HostComponent:
 			return updateHostComponent(workInProgress);
 		case FunctionComponent:
-			return null;
+			return updateFunctionComponent(workInProgress);
 		default:
 			break;
 	}
@@ -31,6 +32,12 @@ function updateHostRoot(workInProgress: FiberNode) {
 
 	const child = workInProgress.memoizedState;
 	reconcileChildren(workInProgress, child);
+	return workInProgress.child;
+}
+
+function updateFunctionComponent(workInProgress: FiberNode) {
+	const nextChildren = renderWithHooks(workInProgress);
+	reconcileChildren(workInProgress, nextChildren);
 	return workInProgress.child;
 }
 

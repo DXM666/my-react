@@ -45,6 +45,7 @@ export const completeWork = (workInProgress: FiberNode) => {
 			bubbleProperties(workInProgress);
 			return null;
 		case FunctionComponent:
+			bubbleProperties(workInProgress);
 			return null;
 		default:
 			break;
