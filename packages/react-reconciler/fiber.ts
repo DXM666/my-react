@@ -24,6 +24,7 @@ export class FiberNode {
 	flags: Flags;
 	subtreeFlags: Flags;
 	updateQueue: any;
+	deletions: FiberNode[] | null;
 
 	constructor({ tag, pendingProps, key }: FiberNodeType) {
 		this.tag = tag;
@@ -48,6 +49,7 @@ export class FiberNode {
 		// 副作用
 		this.flags = NoFlags;
 		this.subtreeFlags = NoFlags;
+		this.deletions = null;
 	}
 }
 

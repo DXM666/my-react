@@ -1,16 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ReactDOM from 'react-dom/client';
 
 function App() {
-	return (
-		<div>
-			<Child name="123" />
-		</div>
-	);
+	const [num, setNum] = useState(100);
+	// @ts-ignore
+	window.setNum = setNum;
+	return num === 3 ? <Child /> : <div>{num}</div>;
 }
 
-function Child(props: { name: string }) {
-	return <span>{props.name}</span>;
+function Child() {
+	return <span>123</span>;
 }
 // const jsx = <div>1231</div>;
 

@@ -11,7 +11,11 @@ import {
 	FunctionComponent,
 	HostText
 } from './workTags';
-import { NoFlags } from './fiberFlags';
+import { NoFlags, Update } from './fiberFlags';
+
+function markUpdate(fiber: FiberNode) {
+	fiber.flags |= Update;
+}
 
 export const completeWork = (workInProgress: FiberNode) => {
 	// ...处理wip
@@ -36,6 +40,11 @@ export const completeWork = (workInProgress: FiberNode) => {
 		case HostText:
 			if (current && workInProgress.stateNode) {
 				// update
+				const oldText = current.memoizedProps.content;
+				const newText = newProps.content;
+				if (oldText !== newText) {
+					markUpdate(workInProgress);
+				}
 			} else {
 				// 生成DOM
 				const instance = createTextInstance(newProps.content);
