@@ -1,11 +1,15 @@
 import { FiberNode } from 'react-reconciler/fiber';
 import { HostText } from 'react-reconciler/workTags';
+import { Props } from 'shared/ReactTypes';
+import { DOMElement, updateFiberProps } from './SyntheticEvent';
 
 export type Container = Element;
 export type Instance = Element;
 export type TextInstance = Text;
-export function createInstance(fiber: FiberNode): Instance {
-	return document.createElement(fiber.type, { ...fiber.pendingProps });
+export function createInstance(type: string, props: Props): DOMElement {
+	const element = document.createElement(type) as unknown as DOMElement;
+	updateFiberProps(element, props);
+	return element;
 }
 export function createTextInstance(text: string | number): Text {
 	return document.createTextNode(`${text}`);
