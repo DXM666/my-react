@@ -7,6 +7,7 @@ import {
 } from './workTags';
 import { Flags, NoFlags } from './fiberFlags';
 import { Container } from 'hostConfig';
+import { Lanes, Lane, NoLane, NoLanes } from './fiberLanes';
 
 type FiberNodeType = { tag: WorkTag; pendingProps: Props; key: Key };
 
@@ -62,13 +63,15 @@ export class FiberRootNode {
 	container: Container;
 	current: FiberNode;
 	finishedWork: FiberNode | null;
-	// pendingChildren: FiberNode | null;
+	pendingLanes: Lanes;
+	finishedLane: Lane;
 	constructor(container: Container, hostRootFiber: FiberNode) {
 		this.container = container;
 		this.current = hostRootFiber;
 		this.finishedWork = null;
 		hostRootFiber.stateNode = this;
-		// this.pendingChildren = null;
+		this.finishedLane = NoLane;
+		this.pendingLanes = NoLanes;
 	}
 }
 

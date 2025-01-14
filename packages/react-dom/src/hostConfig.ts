@@ -50,3 +50,10 @@ export function insertChildToContainer(
 ) {
 	container.insertBefore(child, before);
 }
+
+export const scheduleMicroTask =
+	typeof queueMicrotask === 'function'
+		? queueMicrotask
+		: typeof Promise !== 'undefined'
+			? (cb: (...args: any) => void) => Promise.resolve().then(cb)
+			: setTimeout;

@@ -10,21 +10,21 @@ import { processUpdateQueue } from './updateQueue';
 import { ReactElementType } from 'shared/ReactTypes';
 import { mountChildFibers, reconcileChildFibers } from './childFibers';
 import { renderWithHooks } from './fiberHooks';
+import { Lane } from './fiberLanes';
 
-export const beginWork = (workInProgress: FiberNode) => {
-	console.log('beginWork', workInProgress);
+export const beginWork = (workInProgress: FiberNode, renderLanes: Lane) => {
 	// 1. 递归子节点
 	// 2. 递归兄弟节点
 	// 3. 递归父节点
 	switch (workInProgress.tag) {
 		case HostRoot:
-			return updateHostRoot(workInProgress);
+			return updateHostRoot(workInProgress, renderLanes);
 		case HostComponent:
 			return updateHostComponent(workInProgress);
 		case HostText:
 			return null;
 		case FunctionComponent:
-			return updateFunctionComponent(workInProgress);
+			return updateFunctionComponent(workInProgress, renderLanes);
 		case Fragment:
 			return updateFragment(workInProgress);
 		default:
@@ -38,11 +38,15 @@ function updateFragment(workInProgress: FiberNode) {
 	return workInProgress.child;
 }
 
-function updateHostRoot(workInProgress: FiberNode) {
+function updateHostRoot(workInProgress: FiberNode, renderLanes: Lane) {
 	const baseState = workInProgress.memoizedState;
 	const updateQueue = workInProgress.updateQueue;
 	const pendingUpdate = updateQueue.shared.pending;
-	const { memoizedState } = processUpdateQueue(baseState, pendingUpdate);
+	const { memoizedState } = processUpdateQueue(
+		baseState,
+		pendingUpdate,
+		renderLanes
+	);
 	updateQueue.shared.pending = null;
 	workInProgress.memoizedState = memoizedState;
 
@@ -51,8 +55,8 @@ function updateHostRoot(workInProgress: FiberNode) {
 	return workInProgress.child;
 }
 
-function updateFunctionComponent(workInProgress: FiberNode) {
-	const nextChildren = renderWithHooks(workInProgress);
+function updateFunctionComponent(workInProgress: FiberNode, renderLanes: Lane) {
+	const nextChildren = renderWithHooks(workInProgress, renderLanes);
 	reconcileChildren(workInProgress, nextChildren);
 	return workInProgress.child;
 }

@@ -11,6 +11,7 @@ import {
 import { Dispatch, Dispatcher } from 'react/src/currentDispatcher';
 import { Action } from 'shared';
 import { scheduleUpdateOnFiber } from './workLoop';
+import { Lane, NoLane, requestUpdateLane } from './fiberLanes';
 
 interface Hook {
 	memoizedState: any;
@@ -21,15 +22,19 @@ interface Hook {
 let currentlyRenderingFiber: FiberNode | null = null;
 let workInProgressHook: Hook | null = null;
 let currentHook: Hook | null = null;
+let renderLane: Lane = NoLane;
 
 const { currentDispatcher } = internals;
 
-export function renderWithHooks(workInProgress: FiberNode): any {
+export function renderWithHooks(workInProgress: FiberNode, lane: Lane): any {
 	currentlyRenderingFiber = workInProgress;
 
 	// 重置hooks链表
 	workInProgress.memoizedState = null;
 	workInProgress.updateQueue = null;
+
+	// 重置renderLane
+	renderLane = lane;
 
 	const current = workInProgress.alternate;
 	if (current !== null) {
@@ -48,6 +53,7 @@ export function renderWithHooks(workInProgress: FiberNode): any {
 	currentlyRenderingFiber = null;
 	workInProgressHook = null;
 	currentHook = null;
+	renderLane = NoLane;
 	return children;
 }
 
@@ -56,20 +62,23 @@ const HooksDispatcherOnUpdate: Dispatcher = {
 };
 function updateState<State>(): [State, Dispatch<State>] {
 	// 找到当前useState对应的hook数据
-	const hook = updateWorkInProgresHook();
+	const hook = updateWorkInProgressHook();
 	// 计算新state的逻辑
 	const queue = hook.updateQueue as UpdateQueue<State>;
 	const pending = queue.shared.pending;
 	if (pending !== null) {
 		const { memoizedState } = processUpdateQueue(
 			hook.memoizedState,
-			pending
+			pending,
+			renderLane
 		);
 		hook.memoizedState = memoizedState;
+		// 清空pending队列
+		queue.shared.pending = null;
 	}
 	return [hook.memoizedState, queue.dispatch as Dispatch<State>];
 }
-function updateWorkInProgresHook(): Hook {
+function updateWorkInProgressHook(): Hook {
 	// TODO render阶段触发的更新
 	let nextCurrentHook: Hook | null;
 	if (currentHook === null) {
@@ -147,9 +156,10 @@ function dispatchSetState<State>(
 	updateQueue: UpdateQueue<State>,
 	action: Action<State>
 ) {
-	const update = createUpdate(action);
+	const lane = requestUpdateLane();
+	const update = createUpdate(action, lane);
 	enqueueUpdate(updateQueue, update);
-	scheduleUpdateOnFiber(fiber);
+	scheduleUpdateOnFiber(fiber, lane);
 }
 
 function mountWorkInProgressHook(): Hook {
