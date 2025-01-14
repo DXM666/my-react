@@ -3,31 +3,22 @@ import ReactDOM from 'react-dom/client';
 
 function App() {
 	const [num, setNum] = useState(100);
-	// @ts-ignore
-	// window.setNum = setNum;
-	const arr =
-		num % 2 === 0
-			? [<li key="1">1</li>, <li key="2">2</li>, <li key="3">3</li>]
-			: [<li key="3">3</li>, <li key="2">2</li>, <li key="1">1</li>];
 	return (
 		<div>
-			<ul onClickCapture={() => setNum(num + 1)}>{arr}</ul>
-			<Child prop={'test'}>
+			<Child prop={'test'}></Child>
+			<button
+				style={{ display: 'block' }}
+				onClick={() => setNum(num + 1)}
+			>
 				{num % 2 === 0 ? <span>123</span> : <span>456</span>}
-			</Child>
+			</button>
 		</div>
 	);
 }
 
-function Child(props: { prop: any; children: React.ReactNode }) {
-	return (
-		<span>
-			123{props.prop}
-			<div>{props.children}</div>
-		</span>
-	);
+function Child(props: { prop: any }) {
+	return <span>123{props.prop}</span>;
 }
-// const jsx = <div>1231</div>;
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
 	<App />

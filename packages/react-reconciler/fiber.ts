@@ -88,6 +88,7 @@ export const createWorkInProgress = (
 		workInProgress.pendingProps = pendingProps;
 		workInProgress.flags = NoFlags;
 		workInProgress.subtreeFlags = NoFlags;
+		workInProgress.deletions = null;
 	}
 	workInProgress.type = current.type;
 	workInProgress.stateNode = current.stateNode;
