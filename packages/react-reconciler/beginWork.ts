@@ -1,5 +1,11 @@
 import { FiberNode } from './fiber';
-import { HostRoot, HostComponent, FunctionComponent } from './workTags';
+import {
+	HostRoot,
+	HostComponent,
+	FunctionComponent,
+	Fragment,
+	HostText
+} from './workTags';
 import { processUpdateQueue } from './updateQueue';
 import { ReactElementType } from 'shared/ReactTypes';
 import { mountChildFibers, reconcileChildFibers } from './childFibers';
@@ -15,12 +21,22 @@ export const beginWork = (workInProgress: FiberNode) => {
 			return updateHostRoot(workInProgress);
 		case HostComponent:
 			return updateHostComponent(workInProgress);
+		case HostText:
+			return null;
 		case FunctionComponent:
 			return updateFunctionComponent(workInProgress);
+		case Fragment:
+			return updateFragment(workInProgress);
 		default:
 			break;
 	}
 };
+
+function updateFragment(workInProgress: FiberNode) {
+	const nextChildren = workInProgress.pendingProps;
+	reconcileChildren(workInProgress, nextChildren);
+	return workInProgress.child;
+}
 
 function updateHostRoot(workInProgress: FiberNode) {
 	const baseState = workInProgress.memoizedState;

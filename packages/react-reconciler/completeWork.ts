@@ -9,7 +9,8 @@ import {
 	HostRoot,
 	HostComponent,
 	FunctionComponent,
-	HostText
+	HostText,
+	Fragment
 } from './workTags';
 import { NoFlags, Update } from './fiberFlags';
 import { updateFiberProps } from 'react-dom/src/SyntheticEvent';
@@ -23,9 +24,6 @@ export const completeWork = (workInProgress: FiberNode) => {
 	const newProps = workInProgress.pendingProps;
 	const current = workInProgress.alternate;
 	switch (workInProgress.tag) {
-		case HostRoot:
-			bubbleProperties(workInProgress);
-			return null;
 		case HostComponent:
 			if (current && workInProgress.stateNode) {
 				// update
@@ -55,6 +53,8 @@ export const completeWork = (workInProgress: FiberNode) => {
 			}
 			bubbleProperties(workInProgress);
 			return null;
+		case HostRoot:
+		case Fragment:
 		case FunctionComponent:
 			bubbleProperties(workInProgress);
 			return null;

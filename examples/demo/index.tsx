@@ -3,16 +3,16 @@ import ReactDOM from 'react-dom/client';
 
 function App() {
 	const [num, setNum] = useState(100);
+	const arr =
+		num % 2 === 0
+			? [<li key="1">1</li>, <li key="2">2</li>, <li key="3">3</li>]
+			: [<li key="3">3</li>, <li key="2">2</li>, <li key="1">1</li>];
 	return (
-		<div>
-			<Child prop={'test'}></Child>
-			<button
-				style={{ display: 'block' }}
-				onClick={() => setNum(num + 1)}
-			>
-				{num % 2 === 0 ? <span>123</span> : <span>456</span>}
-			</button>
-		</div>
+		<ul onClickCapture={() => setNum(num + 1)}>
+			<li>4</li>
+			<li>5</li>
+			{arr}
+		</ul>
 	);
 }
 
