@@ -1,26 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 
 function App() {
-	const [num, setNum] = useState(0);
+	const [num, updateNum] = useState(0);
+	useEffect(() => {
+		console.log('App mount');
+	}, []);
+	useEffect(() => {
+		console.log('num change create', num);
+		return () => {
+			console.log('num change destroy', num);
+		};
+	}, [num]);
 
 	return (
-		<ul
-			onClickCapture={() => {
-				setNum((num1) => num1 + 1);
-				setNum((num2) => num2 + 1);
-				setNum((num3) => num3 + 1);
-				console.log('clickCapture', num);
-			}}
-		>
-			{num}
-		</ul>
+		<div onClick={() => updateNum(num + 1)}>
+			{num === 0 ? <Child /> : 'noop'}
+		</div>
 	);
 }
 
-// function Child(props: { prop: any }) {
-// 	return <span>123{props.prop}</span>;
-// }
+function Child() {
+	return <span>123</span>;
+}
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
 	<App />

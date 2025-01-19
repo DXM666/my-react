@@ -6,11 +6,14 @@ import {
 	Instance,
 	removeChild
 } from 'hostConfig';
-import { FiberNode, FiberRootNode } from './fiber';
+import { FiberNode, FiberRootNode, PendingPassiveEffects } from './fiber';
 import {
 	ChildDeletion,
+	Flags,
 	MutationMask,
 	NoFlags,
+	PassiveEffect,
+	PassiveMask,
 	Placement,
 	Update
 } from './fiberFlags';
@@ -20,21 +23,27 @@ import {
 	HostRoot,
 	HostText
 } from './workTags';
+import { FCUpdateQueue, Effect } from './fiberHooks';
+import { HookHasEffect } from './hookEffectTags';
 
-export function commitMutationEffects(finishedWork: FiberNode) {
+export function commitMutationEffects(
+	finishedWork: FiberNode,
+	root: FiberRootNode
+) {
 	let nextEffects = finishedWork;
 	// 向下遍历
 	while (nextEffects !== null) {
 		const child = nextEffects.child;
 		if (
-			(nextEffects.subtreeFlags & MutationMask) !== NoFlags &&
+			(nextEffects.subtreeFlags & (MutationMask | PassiveMask)) !==
+				NoFlags &&
 			child !== null
 		) {
 			nextEffects = child;
 		} else {
 			// 向上遍历
 			up: while (nextEffects !== null) {
-				commitMutationEffectsOnFiber(nextEffects);
+				commitMutationEffectsOnFiber(nextEffects, root);
 				const sibling = nextEffects.sibling;
 				if (sibling !== null) {
 					nextEffects = sibling;
@@ -46,7 +55,7 @@ export function commitMutationEffects(finishedWork: FiberNode) {
 	}
 }
 
-function commitMutationEffectsOnFiber(fiber: FiberNode) {
+function commitMutationEffectsOnFiber(fiber: FiberNode, root: FiberRootNode) {
 	const flags = fiber.flags;
 	// Placement
 	if ((flags & Placement) !== NoFlags) {
@@ -62,10 +71,76 @@ function commitMutationEffectsOnFiber(fiber: FiberNode) {
 	if ((flags & ChildDeletion) !== NoFlags) {
 		const deletions = fiber.deletions;
 		if (deletions !== null) {
-			deletions.forEach(commitDeletion);
+			deletions.forEach((childToDelete) => {
+				commitDeletion(childToDelete, root);
+			});
 		}
 		fiber.flags &= ~ChildDeletion;
 	}
+	if ((flags & PassiveEffect) !== NoFlags) {
+		// 收集回调
+		commitPassiveEffect(fiber, root, 'update');
+		fiber.flags &= ~PassiveEffect;
+	}
+}
+
+function commitPassiveEffect(
+	fiber: FiberNode,
+	root: FiberRootNode,
+	type: keyof PendingPassiveEffects
+) {
+	// update unmount
+	if (
+		fiber.tag !== FunctionComponent ||
+		(type === 'update' && (fiber.flags & PassiveEffect) === NoFlags)
+	) {
+		return;
+	}
+	const updateQueue = fiber.updateQueue as FCUpdateQueue<any>;
+	if (updateQueue !== null) {
+		if (updateQueue.lastEffect === null && __DEV__) {
+			console.error('当FC存在PassiveEffect flag时，不应该不存在effect');
+		}
+		root.pendingPassiveEffects[type].push(updateQueue.lastEffect as Effect);
+	}
+}
+function commitHookEffectList(
+	flags: Flags,
+	lastEffect: Effect,
+	callback: (effect: Effect) => void
+) {
+	let effect = lastEffect.next as Effect;
+	do {
+		if ((effect.tag & flags) === flags) {
+			callback(effect);
+		}
+		effect = effect.next as Effect;
+	} while (effect !== lastEffect.next);
+}
+export function commitHookEffectListUnmount(flags: Flags, lastEffect: Effect) {
+	commitHookEffectList(flags, lastEffect, (effect) => {
+		const destroy = effect.destroy;
+		if (typeof destroy === 'function') {
+			destroy();
+		}
+		effect.tag &= ~HookHasEffect;
+	});
+}
+export function commitHookEffectListDestroy(flags: Flags, lastEffect: Effect) {
+	commitHookEffectList(flags, lastEffect, (effect) => {
+		const destroy = effect.destroy;
+		if (typeof destroy === 'function') {
+			destroy();
+		}
+	});
+}
+export function commitHookEffectListCreate(flags: Flags, lastEffect: Effect) {
+	commitHookEffectList(flags, lastEffect, (effect) => {
+		const create = effect.create;
+		if (typeof create === 'function') {
+			effect.destroy = create();
+		}
+	});
 }
 
 function commitPlacement(fiber: FiberNode) {
@@ -104,7 +179,7 @@ function recordHostChildrenToDelete(
 	// 2. 每找到一个 host节点，判断下这个节点是不是 1 找到那个节点的兄弟节点
 }
 
-function commitDeletion(childToDelete: FiberNode) {
+function commitDeletion(childToDelete: FiberNode, root: FiberRootNode) {
 	if (__DEV__) {
 		console.warn('执行Deletion操作', childToDelete);
 	}
@@ -120,7 +195,8 @@ function commitDeletion(childToDelete: FiberNode) {
 				recordHostChildrenToDelete(rootChildrenToDelete, unmountFiber);
 				return;
 			case FunctionComponent:
-				// TODO useEffect unmount 、解绑ref
+				// TODO 解绑ref
+				commitPassiveEffect(unmountFiber, root, 'unmount');
 				return;
 			default:
 				if (__DEV__) {
