@@ -1,5 +1,11 @@
 import { Container } from 'hostConfig';
 import { Props } from 'shared/ReactTypes';
+import {
+	unstable_ImmediatePriority,
+	unstable_NormalPriority,
+	unstable_runWithPriority,
+	unstable_UserBlockingPriority
+} from 'scheduler';
 
 export const elementPropsKey = '__props';
 const validEventTypeList = ['click'];
@@ -14,7 +20,7 @@ interface Paths {
 export interface DOMElement extends Element {
 	[elementPropsKey]: Props;
 }
-// dom[xxx] = reactElemnt props
+// dom[xxx] = reactElement props
 export function updateFiberProps(node: DOMElement, props: Props) {
 	node[elementPropsKey] = props;
 }
@@ -56,7 +62,7 @@ function dispatchEvent(container: Container, eventType: string, e: Event) {
 	);
 	// 2. 构造合成事件
 	const se = createSyntheticEvent(e);
-	// 3. 遍历captue
+	// 3. 遍历capture
 	triggerEventFlow(capture, se);
 	if (!se.__stopPropagation) {
 		// 4. 遍历bubble
@@ -66,7 +72,9 @@ function dispatchEvent(container: Container, eventType: string, e: Event) {
 function triggerEventFlow(paths: EventCallback[], se: SyntheticEvent) {
 	for (let i = 0; i < paths.length; i++) {
 		const callback = paths[i];
-		callback.call(null, se);
+		unstable_runWithPriority(eventTypeToSchedulerPriority(se.type), () => {
+			callback.call(null, se);
+		});
 		if (se.__stopPropagation) {
 			break;
 		}
@@ -112,4 +120,17 @@ function collectPaths(
 		targetElement = targetElement.parentNode as DOMElement;
 	}
 	return paths;
+}
+
+function eventTypeToSchedulerPriority(eventType: string) {
+	switch (eventType) {
+		case 'click':
+		case 'keydown':
+		case 'keyup':
+			return unstable_ImmediatePriority;
+		case 'scroll':
+			return unstable_UserBlockingPriority;
+		default:
+			return unstable_NormalPriority;
+	}
 }
