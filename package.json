@@ -3,14 +3,13 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "type": "module",
   "scripts": {
     "dev": "vite --config scripts/vite.demo.js",
     "build": "rimraf dist && rollup --bundleConfigAsCjs --config scripts/rollup/dev.config.js",
     "lint": "eslint \"**/*.{js,jsx,ts,tsx}\" --fix",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
     "prepare": "husky",
-    "test": "jest --config scripts/jest/jest.config.js"
+    "test": "jest --config scripts/jest/jest.config.mjs"
   },
   "keywords": [],
   "author": "",

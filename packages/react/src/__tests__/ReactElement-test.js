@@ -26,7 +26,7 @@ describe('ReactElement', () => {
 		global.Symbol = undefined;
 
 		React = require('react');
-		ReactDOM = require('react-dom');
+		// ReactDOM = require('react-dom');
 		ReactTestUtils = require('react-dom/test-utils');
 
 		// NOTE: We're explicitly not using JSX here. This is intended to test
