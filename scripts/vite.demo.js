@@ -40,7 +40,7 @@ export default defineConfig({
 		]
 	},
 	sourceMap: true,
-	root: path.resolve(__dirname, '../examples/demo'),
+	root: path.resolve(__dirname, '../examples/transition'),
 	optimizeDeps: {
 		force: true
 	},

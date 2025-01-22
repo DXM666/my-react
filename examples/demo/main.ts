@@ -52,7 +52,7 @@ function schedule() {
 	// 策略逻辑
 	if (!curWork) {
 		curCallback = null;
-		// eslint-disable-next-line @typescript-eslint/no-unused-expressions
+
 		cbNode && cancelCallback(cbNode);
 		return;
 	}
@@ -61,7 +61,7 @@ function schedule() {
 		return;
 	}
 	// 更高优先级的work
-	// eslint-disable-next-line @typescript-eslint/no-unused-expressions
+
 	cbNode && cancelCallback(cbNode);
 	curCallback = scheduleCallback(curPriority, perform.bind(null, curWork));
 }
