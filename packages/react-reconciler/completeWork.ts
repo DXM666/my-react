@@ -11,9 +11,11 @@ import {
 	HostComponent,
 	FunctionComponent,
 	HostText,
-	Fragment
+	Fragment,
+	ContextProvider
 } from './workTags';
 import { NoFlags, Ref, Update } from './fiberFlags';
+import { popProvider } from './fiberContext';
 
 function markUpdate(fiber: FiberNode) {
 	fiber.flags |= Update;
@@ -69,6 +71,11 @@ export const completeWork = (workInProgress: FiberNode) => {
 		case HostRoot:
 		case Fragment:
 		case FunctionComponent:
+			bubbleProperties(workInProgress);
+			return null;
+		case ContextProvider:
+			const context = workInProgress.type._context;
+			popProvider(context);
 			bubbleProperties(workInProgress);
 			return null;
 		default:

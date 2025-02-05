@@ -40,7 +40,7 @@ export default defineConfig({
 		]
 	},
 	sourceMap: true,
-	root: path.resolve(__dirname, '../examples/ref'),
+	root: path.resolve(__dirname, '../examples/context'),
 	optimizeDeps: {
 		force: true
 	},

@@ -5,6 +5,7 @@ import {
 	currentDispatcher
 } from './src/currentDispatcher';
 import currentBatchConfig from './src/currentBatchConfig';
+export { createContext } from './src/context';
 
 export const useState: Dispatcher['useState'] = (initState: any) => {
 	const currentDispatcher = resolveDispatcher();
@@ -27,6 +28,11 @@ export const useTransition: Dispatcher['useTransition'] = () => {
 export const useRef: Dispatcher['useRef'] = (initialValue) => {
 	const dispatcher = resolveDispatcher() as Dispatcher;
 	return dispatcher.useRef(initialValue);
+};
+
+export const useContext: Dispatcher['useContext'] = (context) => {
+	const dispatcher = resolveDispatcher() as Dispatcher;
+	return dispatcher.useContext(context);
 };
 
 export const __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED = {

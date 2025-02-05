@@ -4,7 +4,8 @@ import {
 	HostComponent,
 	FunctionComponent,
 	Fragment,
-	HostText
+	HostText,
+	ContextProvider
 } from './workTags';
 import { processUpdateQueue, UpdateQueue } from './updateQueue';
 import { ReactElementType } from 'shared/ReactTypes';
@@ -12,6 +13,7 @@ import { mountChildFibers, reconcileChildFibers } from './childFibers';
 import { renderWithHooks } from './fiberHooks';
 import { Lane } from './fiberLanes';
 import { Ref } from './fiberFlags';
+import { pushProvider } from './fiberContext';
 
 export const beginWork = (workInProgress: FiberNode, renderLanes: Lane) => {
 	// 1. 递归子节点
@@ -28,10 +30,22 @@ export const beginWork = (workInProgress: FiberNode, renderLanes: Lane) => {
 			return updateFunctionComponent(workInProgress, renderLanes);
 		case Fragment:
 			return updateFragment(workInProgress);
+		case ContextProvider:
+			return updateContextProvider(workInProgress);
 		default:
 			break;
 	}
 };
+
+function updateContextProvider(workInProgress: FiberNode) {
+	const providerType = workInProgress.type;
+	const context = providerType._context;
+	const newProps = workInProgress.pendingProps;
+	pushProvider(context, newProps.value);
+	const nextChildren = newProps.children;
+	reconcileChildren(workInProgress, nextChildren);
+	return workInProgress.child;
+}
 
 function updateFragment(workInProgress: FiberNode) {
 	const nextChildren = workInProgress.pendingProps;
