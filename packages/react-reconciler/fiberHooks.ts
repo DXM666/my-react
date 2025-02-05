@@ -81,7 +81,8 @@ export function renderWithHooks(workInProgress: FiberNode, lane: Lane): any {
 const HooksDispatcherOnUpdate: Dispatcher = {
 	useState: updateState,
 	useEffect: updateEffect,
-	useTransition: updateTransition
+	useTransition: updateTransition,
+	useRef: updateRef
 };
 
 function updateEffect(create: EffectCallback | void, deps: EffectDeps | void) {
@@ -217,6 +218,11 @@ function updateTransition(): [boolean, (callback: () => void) => void] {
 	return [isPending as boolean, start];
 }
 
+function updateRef<T>(): { current: T } {
+	const hook = updateWorkInProgressHook();
+	return hook.memoizedState;
+}
+
 function updateWorkInProgressHook(): Hook {
 	// TODO render阶段触发的更新
 	let nextCurrentHook: Hook | null;
@@ -267,7 +273,8 @@ function updateWorkInProgressHook(): Hook {
 const HooksDispatcherOnMount: Dispatcher = {
 	useState: mountState,
 	useEffect: mountEffect,
-	useTransition: mountTransition
+	useTransition: mountTransition,
+	useRef: mountRef
 };
 
 function mountEffect(create: EffectCallback | void, deps: EffectDeps | void) {
@@ -313,6 +320,13 @@ function mountTransition(): [boolean, (callback: () => void) => void] {
 	const start = startTransition.bind(null, setPending);
 	hook.memoizedState = start;
 	return [isPending, start];
+}
+
+function mountRef<T>(initialValue: T): { current: T } {
+	const hook = mountWorkInProgressHook();
+	const ref = { current: initialValue };
+	hook.memoizedState = ref;
+	return ref;
 }
 
 function startTransition(setPending: Dispatch<boolean>, callback: () => void) {

@@ -13,10 +13,14 @@ import {
 	HostText,
 	Fragment
 } from './workTags';
-import { NoFlags, Update } from './fiberFlags';
+import { NoFlags, Ref, Update } from './fiberFlags';
 
 function markUpdate(fiber: FiberNode) {
 	fiber.flags |= Update;
+}
+
+function markRef(fiber: FiberNode) {
+	fiber.flags |= Ref;
 }
 
 export const completeWork = (workInProgress: FiberNode) => {
@@ -28,12 +32,21 @@ export const completeWork = (workInProgress: FiberNode) => {
 			if (current && workInProgress.stateNode) {
 				// update
 				markUpdate(workInProgress);
+				// 标记Ref
+				if (current.ref !== workInProgress.ref) {
+					markRef(workInProgress);
+				}
 			} else {
 				// 生成DOM
 				const instance = createInstance(workInProgress.type, newProps);
 				// 插入DOM
 				appendAllChildren(instance, workInProgress);
 				workInProgress.stateNode = instance;
+
+				// 标记Ref
+				if (workInProgress.ref !== null) {
+					markRef(workInProgress);
+				}
 			}
 			bubbleProperties(workInProgress);
 			return null;

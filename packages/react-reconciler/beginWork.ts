@@ -6,11 +6,12 @@ import {
 	Fragment,
 	HostText
 } from './workTags';
-import { processUpdateQueue } from './updateQueue';
+import { processUpdateQueue, UpdateQueue } from './updateQueue';
 import { ReactElementType } from 'shared/ReactTypes';
 import { mountChildFibers, reconcileChildFibers } from './childFibers';
 import { renderWithHooks } from './fiberHooks';
 import { Lane } from './fiberLanes';
+import { Ref } from './fiberFlags';
 
 export const beginWork = (workInProgress: FiberNode, renderLanes: Lane) => {
 	// 1. 递归子节点
@@ -40,7 +41,7 @@ function updateFragment(workInProgress: FiberNode) {
 
 function updateHostRoot(workInProgress: FiberNode, renderLanes: Lane) {
 	const baseState = workInProgress.memoizedState;
-	const updateQueue = workInProgress.updateQueue;
+	const updateQueue = workInProgress.updateQueue as UpdateQueue<Element>;
 	const pendingUpdate = updateQueue.shared.pending;
 	const { memoizedState } = processUpdateQueue(
 		baseState,
@@ -64,10 +65,20 @@ function updateFunctionComponent(workInProgress: FiberNode, renderLanes: Lane) {
 function updateHostComponent(workInProgress: FiberNode) {
 	const nextProps = workInProgress.pendingProps;
 	const nextChildren = nextProps.children;
+	markRef(workInProgress.alternate, workInProgress);
 	reconcileChildren(workInProgress, nextChildren);
 	return workInProgress.child;
 }
 
+function markRef(current: FiberNode | null, workInProgress: FiberNode) {
+	const ref = workInProgress.ref;
+	if (
+		(current === null && ref !== null) ||
+		(current !== null && current.ref !== ref)
+	) {
+		workInProgress.flags |= Ref;
+	}
+}
 function reconcileChildren(
 	workInProgress: FiberNode,
 	children: ReactElementType

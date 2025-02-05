@@ -15,37 +15,41 @@ type FiberNodeType = { tag: WorkTag; pendingProps: Props; key: Key };
 
 export class FiberNode {
 	type: any;
-	tag: any;
+	tag: WorkTag;
 	pendingProps: Props;
 	key: Key;
 	stateNode: any;
-	ref: Ref;
+	ref: Ref | null;
 
-	return: any;
-	sibling: any;
+	return: FiberNode | null;
+	sibling: FiberNode | null;
 	child: FiberNode | null;
-	index: any;
+	index: number;
 
 	memoizedProps: Props | null;
 	memoizedState: any;
 	alternate: FiberNode | null;
 	flags: Flags;
 	subtreeFlags: Flags;
-	updateQueue: any;
+	updateQueue: unknown;
 	deletions: FiberNode[] | null;
 
 	constructor({ tag, pendingProps, key }: FiberNodeType) {
+		// 实例
 		this.tag = tag;
 		this.key = key || null;
+		// HostComponent <div> div DOM
 		this.stateNode = null;
+		// FunctionComponent () => {}
 		this.type = null;
 
-		this.ref = null;
-
+		// 构成树状结构
 		this.return = null;
 		this.sibling = null;
 		this.child = null;
 		this.index = 0;
+
+		this.ref = null;
 
 		// 作为工作单元
 		this.pendingProps = pendingProps;
@@ -123,11 +127,13 @@ export const createWorkInProgress = (
 	workInProgress.child = current.child;
 	workInProgress.memoizedProps = current.memoizedProps;
 	workInProgress.memoizedState = current.memoizedState;
+
+	workInProgress.ref = current.ref;
 	return workInProgress;
 };
 
 export function createFiberFromElement(element: ReactElementType): FiberNode {
-	const { type, key, props } = element;
+	const { type, key, props, ref } = element;
 	let fiberTag: WorkTag = FunctionComponent;
 	if (typeof type === 'string') {
 		// <div/> type: 'div'
@@ -137,6 +143,8 @@ export function createFiberFromElement(element: ReactElementType): FiberNode {
 	}
 	const fiber = new FiberNode({ tag: fiberTag, pendingProps: props, key });
 	fiber.type = type;
+
+	fiber.ref = ref;
 	return fiber;
 }
 
