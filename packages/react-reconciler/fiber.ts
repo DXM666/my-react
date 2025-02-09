@@ -1,9 +1,11 @@
-import { Props, Key, Ref, ReactElementType } from 'shared/ReactTypes';
+import { Props, Key, Ref, ReactElementType, Wakeable } from 'shared/ReactTypes';
 import {
 	ContextProvider,
 	Fragment,
 	FunctionComponent,
 	HostComponent,
+	OffscreenComponent,
+	SuspenseComponent,
 	WorkTag
 } from './workTags';
 import { Flags, NoFlags } from './fiberFlags';
@@ -11,7 +13,7 @@ import { Container } from 'hostConfig';
 import { Lanes, Lane, NoLane, NoLanes } from './fiberLanes';
 import { Effect } from './fiberHooks';
 import { CallbackNode } from 'scheduler';
-import { REACT_PROVIDER_TYPE } from 'shared/ReactSymbols';
+import { REACT_PROVIDER_TYPE, REACT_SUSPENSE_TYPE } from 'shared/ReactSymbols';
 
 type FiberNodeType = { tag: WorkTag; pendingProps: Props; key: Key };
 
@@ -77,11 +79,15 @@ export class FiberRootNode {
 	current: FiberNode;
 	finishedWork: FiberNode | null;
 	pendingLanes: Lanes;
+	suspendedLanes: Lanes;
+	pingedLanes: Lanes;
 	finishedLane: Lane;
 	pendingPassiveEffects: PendingPassiveEffects;
 
 	callbackNode: CallbackNode | null;
 	callbackPriority: Lane;
+
+	pingCache: WeakMap<Wakeable<any>, Set<Lane>> | null;
 	constructor(container: Container, hostRootFiber: FiberNode) {
 		this.container = container;
 		this.current = hostRootFiber;
@@ -89,6 +95,8 @@ export class FiberRootNode {
 		hostRootFiber.stateNode = this;
 		this.finishedLane = NoLane;
 		this.pendingLanes = NoLanes;
+		this.suspendedLanes = NoLanes;
+		this.pingedLanes = NoLanes;
 
 		this.callbackNode = null;
 		this.callbackPriority = NoLane;
@@ -97,6 +105,8 @@ export class FiberRootNode {
 			unmount: [],
 			update: []
 		};
+
+		this.pingCache = null;
 	}
 }
 
@@ -145,6 +155,8 @@ export function createFiberFromElement(element: ReactElementType): FiberNode {
 		type.$$typeof === REACT_PROVIDER_TYPE
 	) {
 		fiberTag = ContextProvider;
+	} else if (type === REACT_SUSPENSE_TYPE) {
+		fiberTag = SuspenseComponent;
 	} else if (typeof type !== 'function' && __DEV__) {
 		console.warn('为定义的type类型', element);
 	}
@@ -157,5 +169,19 @@ export function createFiberFromElement(element: ReactElementType): FiberNode {
 
 export function createFiberFromFragment(elements: any[], key: Key): FiberNode {
 	const fiber = new FiberNode({ tag: Fragment, pendingProps: elements, key });
+	return fiber;
+}
+
+export interface OffscreenProps {
+	mode: 'visible' | 'hidden';
+	children: any;
+}
+export function createFiberFromOffscreen(pendingProps: OffscreenProps) {
+	const fiber = new FiberNode({
+		tag: OffscreenComponent,
+		pendingProps,
+		key: null
+	});
+	// TODO stateNode
 	return fiber;
 }
