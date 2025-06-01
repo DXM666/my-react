@@ -26,6 +26,14 @@ export const useEffect: Dispatcher['useEffect'] = (
 	return currentDispatcher.useEffect(create, deps);
 };
 
+export const useLayoutEffect: Dispatcher['useLayoutEffect'] = (
+	create: () => (() => void) | void,
+	deps?: HookDeps | undefined
+) => {
+	const currentDispatcher = resolveDispatcher();
+	return currentDispatcher.useLayoutEffect(create, deps);
+};
+
 export const useTransition: Dispatcher['useTransition'] = () => {
 	const dispatcher = resolveDispatcher();
 	return dispatcher.useTransition();

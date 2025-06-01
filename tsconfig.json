@@ -4,6 +4,7 @@
 	"exclude": ["examples", "dist", "node_modules"],
 	"compilerOptions": {
 		"target": "ESNext",
+		"jsx": "react-jsx",
 		"useDefineForClassFields": true,
 		"module": "ESNext",
 		"lib": ["ESNext", "DOM"],

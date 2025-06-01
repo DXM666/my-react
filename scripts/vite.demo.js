@@ -40,7 +40,7 @@ export default defineConfig({
 		]
 	},
 	sourceMap: true,
-	root: path.resolve(__dirname, '../examples/suspense-use'),
+	root: path.resolve(__dirname, '../examples/demo'),
 	optimizeDeps: {
 		force: true
 	},

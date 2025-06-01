@@ -14,6 +14,7 @@ import { FiberNode, FiberRootNode, PendingPassiveEffects } from './fiber';
 import {
 	ChildDeletion,
 	Flags,
+	LayoutEffect,
 	LayoutMask,
 	MutationMask,
 	NoFlags,
@@ -32,7 +33,7 @@ import {
 	OffscreenComponent
 } from './workTags';
 import { FCUpdateQueue, Effect } from './fiberHooks';
-import { HookHasEffect } from './hookEffectTags';
+import { HookHasEffect, Layout } from './hookEffectTags';
 
 let nextEffect: FiberNode | null = null;
 
@@ -184,6 +185,19 @@ const commitLayoutEffectsOnFiber = (
 ) => {
 	console.log('commitLayoutEffectsOnFiber', root);
 	const { flags, tag } = finishedWork;
+
+	// 处理 Layout Effects
+	if (tag === FunctionComponent && (flags & LayoutEffect) !== NoFlags) {
+		const updateQueue = finishedWork.updateQueue as FCUpdateQueue<any>;
+		if (updateQueue !== null && updateQueue.lastEffect !== null) {
+			const lastEffect = updateQueue.lastEffect;
+			commitHookEffectListDestroy(Layout | HookHasEffect, lastEffect);
+			commitHookEffectListCreate(Layout | HookHasEffect, lastEffect);
+		}
+		finishedWork.flags &= ~LayoutEffect;
+	}
+
+	// 处理 Ref
 	if ((flags & Ref) !== NoFlags && tag === HostComponent) {
 		// 绑定新的ref
 		safelyAttachRef(finishedWork);

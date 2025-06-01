@@ -117,7 +117,6 @@ export function ensureRootIsScheduled(root: FiberRootNode) {
 
 	if (updateLane === SyncLane) {
 		// 同步优先级 用微任务调度
-		// [performSyncWorkOnRoot, performSyncWorkOnRoot, performSyncWorkOnRoot]
 		scheduleSyncCallback(performSyncWorkOnRoot.bind(null, root));
 		scheduleMicroTask(flushSyncCallbacks);
 	} else {

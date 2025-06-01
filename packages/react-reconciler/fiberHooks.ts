@@ -27,8 +27,8 @@ import {
 	removeLanes,
 	requestUpdateLane
 } from './fiberLanes';
-import { Flags, PassiveEffect } from './fiberFlags';
-import { Passive, HookHasEffect } from './hookEffectTags';
+import { Flags, PassiveEffect, LayoutEffect } from './fiberFlags';
+import { Passive, Layout, HookHasEffect } from './hookEffectTags';
 import ReactCurrentBatchConfig from 'react/src/currentBatchConfig';
 import { trackUsedThenable } from './thenable';
 import { markWipReceivedUpdate } from './beginWork';
@@ -106,6 +106,7 @@ export function renderWithHooks(
 const HooksDispatcherOnUpdate: Dispatcher = {
 	useState: updateState,
 	useEffect: updateEffect,
+	useLayoutEffect: updateLayoutEffect,
 	useTransition: updateTransition,
 	useRef: updateRef,
 	useContext: readContext,
@@ -113,6 +114,40 @@ const HooksDispatcherOnUpdate: Dispatcher = {
 	useMemo: updateMemo,
 	useCallback: updateCallback
 };
+
+function updateLayoutEffect(
+	create: EffectCallback | void,
+	deps: HookDeps | void
+) {
+	const hook = updateWorkInProgressHook();
+	const nextDeps = deps === undefined ? null : deps;
+	let destroy: EffectCallback | void;
+	if (currentHook !== null) {
+		const prevEffect = currentHook.memoizedState as Effect;
+		destroy = prevEffect.destroy;
+		if (nextDeps !== null) {
+			// 浅比较依赖
+			const prevDeps = prevEffect.deps;
+			if (areHookInputsEqual(nextDeps, prevDeps)) {
+				hook.memoizedState = pushEffect(
+					Layout,
+					create,
+					destroy,
+					nextDeps
+				);
+				return;
+			}
+		}
+		// 浅比较 不相等
+		(currentlyRenderingFiber as FiberNode).flags |= LayoutEffect;
+		hook.memoizedState = pushEffect(
+			Layout | HookHasEffect,
+			create,
+			destroy,
+			nextDeps
+		);
+	}
+}
 
 function updateEffect(create: EffectCallback | void, deps: HookDeps | void) {
 	const hook = updateWorkInProgressHook();
@@ -318,6 +353,7 @@ function updateWorkInProgressHook(): Hook {
 const HooksDispatcherOnMount: Dispatcher = {
 	useState: mountState,
 	useEffect: mountEffect,
+	useLayoutEffect: mountLayoutEffect,
 	useTransition: mountTransition,
 	useRef: mountRef,
 	useContext: readContext,
@@ -332,6 +368,21 @@ function mountEffect(create: EffectCallback | void, deps: HookDeps | void) {
 	(currentlyRenderingFiber as FiberNode).flags |= PassiveEffect;
 	hook.memoizedState = pushEffect(
 		Passive | HookHasEffect,
+		create,
+		undefined,
+		nextDeps
+	);
+}
+
+function mountLayoutEffect(
+	create: EffectCallback | void,
+	deps: HookDeps | void
+) {
+	const hook = mountWorkInProgressHook();
+	const nextDeps = deps === undefined ? null : deps;
+	(currentlyRenderingFiber as FiberNode).flags |= LayoutEffect;
+	hook.memoizedState = pushEffect(
+		Layout | HookHasEffect,
 		create,
 		undefined,
 		nextDeps
@@ -379,7 +430,10 @@ function mountRef<T>(initialValue: T): { current: T } {
 	return ref;
 }
 
-function startTransition(setPending: Dispatch<boolean>, callback: () => void) {
+export function startTransition(
+	setPending: Dispatch<boolean>,
+	callback: () => void
+) {
 	setPending(true);
 	const prevTransition = ReactCurrentBatchConfig.transition;
 	ReactCurrentBatchConfig.transition = 1;
@@ -408,10 +462,10 @@ function dispatchSetState<State>(
 		// 当前产生的update是这个fiber的第一个update
 		// 1. 更新前的状态 2.计算状态的方法
 		const currentState = updateQueue.lastRenderedState;
-		const eagarState = basicStateReducer(currentState, action);
+		const eagerState = basicStateReducer(currentState, action);
 		update.hasEagerState = true;
-		update.eagerState = eagarState;
-		if (Object.is(currentState, eagarState)) {
+		update.eagerState = eagerState;
+		if (Object.is(currentState, eagerState)) {
 			enqueueUpdate(updateQueue, update, fiber, NoLane);
 			// 命中eagerState
 			if (__DEV__) {

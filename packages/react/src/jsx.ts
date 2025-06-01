@@ -66,23 +66,52 @@ const jsx = (
 export const Fragment = REACT_FRAGMENT_TYPE;
 
 // 为开发环境导出的 jsx 转换函数
-const jsxDEV = (type: ElementType, config: any): ReactElementType => {
-	let key: Key = null;
-	const props: Props = {};
-	let ref: Ref = null;
+// const jsxDEV = (type: ElementType, config: any): ReactElementType => {
+// 	let key: Key = null;
+// 	const props: Props = {};
+// 	let ref: Ref = null;
 
-	if (config !== null) {
-		if (config.key !== undefined) {
-			key = config.key;
+// 	if (config !== null) {
+// 		if (config.key !== undefined) {
+// 			key = config.key;
+// 		}
+// 		if (config.ref !== undefined) {
+// 			ref = config.ref;
+// 		}
+// 		Object.assign(props, config);
+// 	}
+
+// 	return ReactElement(type, key, ref, props);
+// };
+
+function jsxDEV(
+	type: ElementType,
+	config: any,
+	maybeKey: any
+	// source: any,
+	// self: any
+) {
+	{
+		var props = {};
+		var key = null;
+		var ref = null;
+
+		if (maybeKey !== undefined) {
+			key = '' + maybeKey;
 		}
-		if (config.ref !== undefined) {
-			ref = config.ref;
+		if (config !== null) {
+			if (config.key !== undefined) {
+				key = config.key;
+			}
+			if (config.ref !== undefined) {
+				ref = config.ref;
+			}
+			Object.assign(props, config);
 		}
-		Object.assign(props, config);
+
+		return ReactElement(type, key, ref, props);
 	}
-
-	return ReactElement(type, key, ref, props);
-};
+}
 
 function isValidElement(object: any) {
 	return (

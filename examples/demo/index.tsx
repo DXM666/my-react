@@ -1,29 +1,60 @@
-import React, { useState } from 'react';
+import React, { useState, useTransition } from 'react';
 import ReactDOM from 'react-dom/client';
 
-function App() {
-	const [num, update] = useState(100);
+// function App() {
+// 	const [num, update] = useState(100);
+// 	const ctxA = createContext('default A');
+// 	useEffect(() => {
+// 		console.log('App effect');
+// 		return () => {
+// 			console.log('destroy');
+// 		};
+// 	}, [num]);
 
+// 	useLayoutEffect(() => {
+// 		console.log('App layout effect');
+// 		return () => {
+// 			console.log('destroy');
+// 		};
+// 	}, [num]);
+
+// 	return (
+// 		<ctxA.Provider value="A">
+// 			<div>
+// 				<button onClick={() => update(num + 1)}>+ 1</button>
+// 				<p>num is: {num}</p>
+// 				<>123</>
+// 			</div>
+// 		</ctxA.Provider>
+// 	);
+// }
+
+export default function App() {
+	const [a, updateA] = useState('a');
+	const [b, updateB] = useState('b');
+	const [c, updateC] = useState('c');
+	const [d, updateD] = useState('d');
+	const [, startTransition] = useTransition();
+	console.log('hello');
 	return (
-		<ul onClick={() => update(50)}>
-			<div>123</div>
-			{new Array(num).fill(0).map((_, i) => {
-				return <Child key={i}>{i}</Child>;
-			})}
-		</ul>
+		<div
+			onClick={() => {
+				startTransition(() => {
+					updateB(b + '2');
+					updateD(d + '2');
+				});
+				updateA(a + '1');
+				updateC(c + '1');
+			}}
+		>
+			<div>{a}</div>
+			<div>{b}</div>
+			<div>{c}</div>
+			<div>{d}</div>
+		</div>
 	);
-}
-
-function Child({ children }) {
-	const now = performance.now();
-	while (performance.now() - now < 4) {}
-	return <li>{children}</li>;
 }
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
 	<App />
 );
-
-// ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-// 	(<App />) as any
-// );

@@ -7,6 +7,10 @@ export interface Dispatcher {
 		create: () => (() => void) | void,
 		deps?: HookDeps | undefined
 	) => void;
+	useLayoutEffect: (
+		create: () => (() => void) | void,
+		deps?: HookDeps | undefined
+	) => void;
 	useTransition: () => [boolean, (callback: () => void) => void];
 	useRef: <T>(initialValue: T) => { current: T };
 	useContext: <T>(context: ReactContext<T>) => T;
